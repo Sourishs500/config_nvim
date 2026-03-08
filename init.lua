@@ -221,6 +221,12 @@ vim.keymap.set("v", "jk", "<Esc>", { desc = "Remap Esc" })
 vim.keymap.set("i", "jk", "<Esc>", { desc = "Remap Esc" })
 vim.opt.timeoutlen = 100
 
+-- Bufferline (fancy tabs)
+vim.opt.termguicolors = true
+
+-- For compatibility with NvimTree
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
 -- [[ Configure and install plugins ]]
 --
 --  To check the current status of your plugins, run
@@ -239,6 +245,27 @@ require("lazy").setup({
 	-- NOTE: Plugins can also be added by using a table,
 	-- with the first argument being the link and the following
 	-- keys can be used to configure plugin behavior/loading/etc.
+
+	-- Fancy aesthetic things that the normal Apple terminal doesn't really support
+	{
+		"akinsho/bufferline.nvim",
+		version = "*",
+		dependencies = "nvim-tree/nvim-web-devicons",
+		cond = function()
+			return vim.env.TERM_PROGRAM ~= "Apple_Terminal"
+		end,
+	},
+	{
+		"sphamba/smear-cursor.nvim",
+		opts = {},
+		cond = function()
+			return vim.env.TERM_PROGRAM ~= "Apple_Terminal"
+		end,
+	},
+
+	-- NvimTree (alternative to netrw)
+	"nvim-tree/nvim-tree.lua",
+	"nvim-tree/nvim-web-devicons",
 	--
 	-- Use `opts = {}` to force a plugin to be loaded.
 	--
@@ -665,6 +692,7 @@ require("lazy").setup({
 				automatic_enable = {
 					"rust_analyzer",
 					"pyright",
+					"clangd",
 				},
 			})
 			--[[
@@ -848,13 +876,19 @@ require("lazy").setup({
 		-- change the command in the config to whatever the name of that colorscheme is.
 		--
 		-- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
-		"gosukiwi/vim-atom-dark",
+		-- "gosukiwi/vim-atom-dark",
+		-- "sainnhe/gruvbox-material",
+		"EdenEast/nightfox.nvim",
+		lazy = false,
 		priority = 1000, -- Make sure to load this before all the other start plugins.
-		init = function()
+		config = function()
 			-- Load the colorscheme here.
 			-- Like many other themes, this one has different styles, and you could load
 			-- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-			vim.cmd.colorscheme("atom-dark-256")
+			-- vim.cmd.colorscheme("atom-dark-256")
+			-- vim.g.gruvbox_material_enable_italic = true
+			-- vim.cmd.colorscheme("gruvbox-material")
+			vim.cmd.colorscheme("carbonfox")
 
 			-- You can configure highlights by doing something like:
 		end,
@@ -986,6 +1020,16 @@ require("lazy").setup({
 		},
 	},
 })
+
+require("nvim-tree").setup()
+
+if vim.env.TERM_PROGRAM ~= "Apple_Terminal" then
+	require("bufferline").setup({
+		options = {
+			separator_style = "slant",
+		},
+	})
+end
 
 local vim = vim
 local Plug = vim.fn["plug#"]
